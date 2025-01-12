@@ -25,8 +25,8 @@ def investments_page():
                 payload = {
                     "model": "llama-3.2-3b-instruct",  # Replace with your model identifier
                     "prompt": ollama_prompt,
-                    "max_tokens": 200,  # You can adjust this
-                    "temperature": 0.7,  # For randomness in responses
+                    "max_tokens": 500,  # You can adjust this
+                    "temperature": 0.5,  # For randomness in responses
                     "stream": False,
                 }
 
