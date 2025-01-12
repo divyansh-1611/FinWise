@@ -18,7 +18,9 @@ def banking_page():
     with st.expander("Transfer Funds", expanded=False):
         with st.form("transfer_form"):
             transfer_to = st.text_input("Recipient Account")
-            transfer_amount = st.number_input("Amount to Transfer", min_value=1.0, max_value=account_balance, step=10.0 )
+            max_transfer_value = account_balance if account_balance > 0 else 1000.00
+            transfer_amount = st.number_input("Amount to Transfer", min_value=1.0, max_value=max_transfer_value,
+                                              step=10.0)
             if st.form_submit_button("Transfer"):
                 st.success(f"Successfully transferred ${transfer_amount:.2f} to {transfer_to}.")
 
@@ -42,10 +44,13 @@ def banking_page():
     # Account Balance History
     st.subheader("Account Balance History")
     recommendation = recommend_investment() #calling a recommendation so that I can get the rate and calculate the balance for the history.
-    balance_history_data = [{
-    'date': inv['date'] - timedelta(days=np.random.randint(1, 30)), 
-    'balance': inv['amount'] * (1 + int(recommendation['rate']) / 100 / 12) ** np.random.randint(1, 30)
-    } for inv in st.session_state['investments']]
+    if st.session_state['investments']:
+        balance_history_data = [{
+            'date': inv['date'] - timedelta(days=np.random.randint(1, 30)),
+            'balance': inv['amount'] * (1 + int(recommendation['rate']) / 100 / 12) ** np.random.randint(1, 30)
+        } for inv in st.session_state['investments']]
+    else:
+        balance_history_data = [{'date': datetime.now(), 'balance': 0}]  # Default value when investments are empty
     df_balance_history = pd.DataFrame(balance_history_data).sort_values('date')
     fig_balance = px.line(df_balance_history, x='date', y='balance', title='Account Balance Trend')
     st.plotly_chart(fig_balance)
